@@ -11,10 +11,13 @@ Something about paths and /usr/local/bin, If someone would like to tell me where
 
 ###Running
 ```nuke.py [-h][-i iterations][-b blocksize] target```
+
 Arguments can be in any order and grouped as follows `[-ib iterations blocksize] or [-bi blocksize iterations]`
 ####Arguments
 `h` Print help and exit.
+
 `i` Itterations of sucessive 0's and 1's to write to the target. \[Default 3\]
+
 `b` Blocksize (in bytes) to use in each write batch (may effect performance, may not \[Default 32MB\]
 
 ##Licence
