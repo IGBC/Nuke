@@ -19,9 +19,17 @@ def main():
 	iterations = results["iterations"]
 
 	#gallons and gallons of debug data
-	print("Filepath: " + filepath)
-	print("Blocksize: " + str(blocksize))
-	print("Iterations: " + str(iterations))
+	#print("Filepath: " + filepath)
+	#print("Blocksize: " + str(blocksize))
+	#print("Iterations: " + str(iterations))
+
+	print("Nuke will now erase ALL data on "+filepath+" including partitions and partition tables. All Data will be overwritten and irrecoverable.")
+	print("Options Used:\n    Blocksize  = "+helper.sizeof_fmt(blocksize)+"\n    Iterations = "+str(iterations))
+	confirm = input("\nAre you sure you wish to continue? [y/N]:")
+	if (confirm != "y") and (confirm != "Y"):
+		#program cancelled by user
+		return 1
+	# else we continue
 
 	# Abitrary boobs (It's 10pm, and this isn't a cludge of hacks yet) (.)(.)
 
@@ -33,10 +41,13 @@ def main():
 	write = 0
 	# repeat for number of iterations
 	for i in range(1, iterations+1):
+		# Get clear of the last output from writePass
+		print("\n")
 		print("Writing Pass "+ str(i))
 		# do a write pass
 		writePass(filepath, deviceSize, blocksize, write)
 		write = 1-write #invert write 0 -> 1; 1 -> 0
+	print()
 	return 0
 #end #if you are not me ignore these they make it easier to spot the end of highly indented functions
 
@@ -62,7 +73,9 @@ def writePass(filepath, size, blocksize, write):
 		while bytesWritten < size:
 			outputFileH.write(inputData)
 			bytesWritten += blocksize
-			# TODO: Text UI 
+			# TODO: Text UI
+			print(" "*96, end="\r")
+			print("Written "+helper.sizeof_fmt(bytesWritten)+" of "+helper.sizeof_fmt(size), end="\r") 
 	except IOError as e:
 		pass
 	finally:
@@ -70,8 +83,6 @@ def writePass(filepath, size, blocksize, write):
 		outputFileH.close()	
 		#flush IO buffers in the kernal
 		os.sync()
-		#Let the user know we're not lazy
-		print("Wrote " + helper.sizeof_fmt(bytesWritten))
 #end
 
 #entry point
