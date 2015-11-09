@@ -3,6 +3,7 @@ import sys
 import nk_arg_parser as parser
 import nk_helper as helper
 import os
+import datetime
 
 def main():
 	results = parser.nukeArgParser().get()
@@ -43,7 +44,7 @@ def main():
 	for i in range(1, iterations+1):
 		# Get clear of the last output from writePass
 		print("\n")
-		print("Writing Pass "+ str(i))
+		print("Starting Pass "+ str(i))
 		# do a write pass
 		writePass(filepath, deviceSize, blocksize, write)
 		write = 1-write #invert write 0 -> 1; 1 -> 0
@@ -66,6 +67,10 @@ def writePass(filepath, size, blocksize, write):
 
 	bytesWritten = 0
 
+	#timeing control
+	startTime = datetime.datetime.now()
+	lastUpdate = datetime.datetime.now()
+
 	# Flood it with our input data untill it begs us to stop,
 	# ... using a valid safe word of course (well an IOError Execption).
 	try:
@@ -73,10 +78,26 @@ def writePass(filepath, size, blocksize, write):
 		while bytesWritten < size:
 			outputFileH.write(inputData)
 			bytesWritten += blocksize
-			# TODO: Text UI
-			print(" "*96, end="\r")
-			print("Written "+helper.sizeof_fmt(bytesWritten)+" of "+helper.sizeof_fmt(size), end="\r") 
+			
+			
+			
+			#get time for speed calculations
+			now = datetime.datetime.now()
+			
+			#check if we updated recently
+			if (now - lastUpdate) >= datetime.timedelta(seconds=1):
+				lastUpdate = now
+				elapsed = (now - startTime).total_seconds()
+				
+				#calculate B/s
+				BpS = bytesWritten / elapsed
+
+				#clear term line
+				print(" "*96, end="\r")
+				print("Written "+helper.sizeof_fmt(bytesWritten)+"/"+helper.sizeof_fmt(size)+" ["+helper.sizeof_fmt(BpS)+"/s]", end="\r") 
+	
 	except IOError as e:
+		print("Woops")
 		pass
 	finally:
 		#close file
