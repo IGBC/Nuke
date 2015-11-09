@@ -69,14 +69,14 @@ class nukeArgParser:
 	
 	def flagParser(self, arg, n):
 		for char in arg:
-			if char == ("h" or "H"): self.helpmsg = True
+			if (char == "h") or (char == "H"): self.helpmsg = True
 
-			elif char == ("b" or "B"):
+			elif (char == "b") or (char == "B"):
 				try: self.bs = int(self.getNextVal(n))
 				except ValueError :
 					self.helpmsg = True
 
-			elif char == ("i" or "I"):
+			elif (char == "i") or (char == "I"):
 				try: self.iterations = int(self.getNextVal(n))
 				except ValueError :
 					self.helpmsg = True
