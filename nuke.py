@@ -66,19 +66,24 @@ def writePass(filepath, size, blocksize, write):
 	outputFileH.seek(0, 0)
 
 	bytesWritten = 0
+	bytesSinceUpdate = 0
 
 	#timeing control
 	startTime = datetime.datetime.now()
 	lastUpdate = datetime.datetime.now()
+
+	BpS = 0 #weird scope issue
 
 	# Flood it with our input data untill it begs us to stop,
 	# ... using a valid safe word of course (well an IOError Execption).
 	try:
 		# This will flood the disk with data until the error fires. or we reach our disk size
 		while bytesWritten < size:
+
+			#write and count
 			outputFileH.write(inputData)
 			bytesWritten += blocksize
-			
+			bytesSinceUpdate += blocksize
 			
 			
 			#get time for speed calculations
@@ -86,20 +91,41 @@ def writePass(filepath, size, blocksize, write):
 			
 			#check if we updated recently
 			if (now - lastUpdate) >= datetime.timedelta(seconds=1):
+				shortElapsed = (now - lastUpdate).total_seconds()
 				lastUpdate = now
-				elapsed = (now - startTime).total_seconds()
+				longElapsed = (now - startTime).total_seconds()
 				
+
 				#calculate B/s
-				BpS = bytesWritten / elapsed
+				shortBpS = bytesSinceUpdate / shortElapsed
+				bytesSinceUpdate = 0
+
+				longBpS = bytesWritten / longElapsed
 
 				#clear term line
 				print(" "*96, end="\r")
-				print("Written "+helper.sizeof_fmt(bytesWritten)+"/"+helper.sizeof_fmt(size)+" ["+helper.sizeof_fmt(BpS)+"/s]", end="\r") 
+				print("Written "+helper.sizeof_fmt(bytesWritten)+"/"+helper.sizeof_fmt(size)+" ["+helper.sizeof_fmt(longBpS)+"/s Avg] ["+helper.sizeof_fmt(shortBpS)+"/s Cur]", end="\r") 
 	
 	except IOError as e:
-		print("Woops")
 		pass
 	finally:
+		#print a final line else the output looks incomplete
+		
+		shortElapsed = (now - lastUpdate).total_seconds()
+		lastUpdate = now
+		longElapsed = (now - startTime).total_seconds()
+		
+
+		#calculate B/s
+		shortBpS = bytesSinceUpdate / shortElapsed
+		bytesSinceUpdate = 0
+
+		longBpS = bytesWritten / longElapsed
+
+		#clear term line
+		print(" "*96, end="\r")
+		print("Written "+helper.sizeof_fmt(bytesWritten)+"/"+helper.sizeof_fmt(size)+" ["+helper.sizeof_fmt(longBpS)+"/s Avg] ["+helper.sizeof_fmt(shortBpS)+"/s Avg]", end="\r")
+
 		#close file
 		outputFileH.close()	
 		#flush IO buffers in the kernal
