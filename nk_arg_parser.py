@@ -1,4 +1,5 @@
 import sys
+import sizeconverter
 
 class nukeArgParser:
 	def __init__(self, parent=None):
@@ -10,6 +11,7 @@ class nukeArgParser:
 		self.bs = 32*1024*1024
 		self.iterations = 3
 		self.helpmsg = False
+		self.random = False
 	#end
 
 	#function that does everything
@@ -32,7 +34,8 @@ class nukeArgParser:
 		else:
 			return {"filepath": self.filepath,
 					"blocksize": self.bs,
-					"iterations": self.iterations}
+					"iterations": self.iterations,
+					"random": self.random}
 
 	#end
 
@@ -71,8 +74,10 @@ class nukeArgParser:
 		for char in arg:
 			if (char == "h") or (char == "H"): self.helpmsg = True
 
+			elif (char == "u") or (char == "U"): self.random = True
+
 			elif (char == "b") or (char == "B"):
-				try: self.bs = int(self.getNextVal(n))
+				try: self.bs = int(sizeconverter.sizeconverter(self.getNextVal(n))[0])
 				except ValueError :
 					self.helpmsg = True
 
