@@ -6,12 +6,18 @@ import os
 import datetime
 import random
 
+# Return codes: 
+#	0: Success
+#	1: Canceled by user
+#	-1: Did nothing
+
 def main():
 	results = parser.nukeArgParser().get()
 	# if argparser returned a help command
 	if results == "HELP" :
 		helper.printHelp()
-		return 0
+		# Return Did Nothing
+		return -1
 	
 	# else run the program
 
@@ -21,11 +27,7 @@ def main():
 	iterations = results["iterations"]
 	random = results["random"]
 
-	#gallons and gallons of debug data
-	#print("Filepath: " + filepath)
-	#print("Blocksize: " + str(blocksize))
-	#print("Iterations: " + str(iterations))
-
+	# Print out user Prompt
 	print("Nuke will now erase ALL data on "+filepath+" including partitions and partition tables. All Data will be overwritten and irrecoverable.")
 	print("Options Used:\n    Blocksize  = "+helper.sizeof_fmt(blocksize)+"\n    Iterations = "+str(iterations))
 	if random:
@@ -33,7 +35,7 @@ def main():
 
 	confirm = input("\nAre you sure you wish to continue? [y/N]:")
 	if (confirm != "y") and (confirm != "Y"):
-		#program cancelled by user
+		# Program cancelled by user
 		return 1
 	# else we continue
 
@@ -41,7 +43,6 @@ def main():
 
 	# Get how big the filepath target is
 	deviceSize = helper.get_file_size(filepath)
-		
 
 	# set what we're writing
 	write = 0

@@ -16,7 +16,8 @@ def get_file_size(filename):
 			os.close(fd)
 	except IOError as e:
 		print("Error Reading \""+filename+"\"\nExiting.")
-		sys.exit(1)
+		# Exit with "Did Nothing"
+		sys.exit(-1)
 #end
 
 # Open and print man page
