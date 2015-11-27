@@ -4,6 +4,7 @@ import nk_arg_parser as parser
 import nk_helper as helper
 import os
 import datetime
+import random
 
 def main():
 	results = parser.nukeArgParser().get()
@@ -18,6 +19,7 @@ def main():
 	filepath = results["filepath"]
 	blocksize = results["blocksize"]
 	iterations = results["iterations"]
+	random = results["random"]
 
 	#gallons and gallons of debug data
 	#print("Filepath: " + filepath)
@@ -26,6 +28,9 @@ def main():
 
 	print("Nuke will now erase ALL data on "+filepath+" including partitions and partition tables. All Data will be overwritten and irrecoverable.")
 	print("Options Used:\n    Blocksize  = "+helper.sizeof_fmt(blocksize)+"\n    Iterations = "+str(iterations))
+	if random:
+		print("\n    Final pass will be pseudorandom data [WARNING: This is very slow]")
+
 	confirm = input("\nAre you sure you wish to continue? [y/N]:")
 	if (confirm != "y") and (confirm != "Y"):
 		#program cancelled by user
@@ -45,21 +50,23 @@ def main():
 		# Get clear of the last output from writePass
 		print("\n")
 		print("Starting Pass "+ str(i))
-		# do a write pass
-		writePass(filepath, deviceSize, blocksize, write)
-		write = 1-write #invert write 0 -> 1; 1 -> 0
+
+		# Do a write pass
+		# If final pass and random enabled
+		if (i == iterations) and (random):
+			# Make final pass random
+			writePass(filepath, deviceSize, blocksize, "r")
+		else:
+			# Make a normal pass
+			writePass(filepath, deviceSize, blocksize, write)
+			write = 1-write #invert write 0 -> 1; 1 -> 0
+	
 	print()
 	return 0
 #end #if you are not me ignore these they make it easier to spot the end of highly indented functions
 
 
 def writePass(filepath, size, blocksize, write):
-	# Define input data for a 1 or 0
-	if write == 0 :
-		inputData = b'\x00'*blocksize
-	else :
-		inputData = b'\xFF'*blocksize
-
 	# Open our output file (write, binary) 
 	outputFileH=open(filepath, mode="wb")
 	# Jump to the start of the ouput file
@@ -74,11 +81,28 @@ def writePass(filepath, size, blocksize, write):
 
 	BpS = 0 #weird scope issue
 
+	#get time for speed calculations
+	now = datetime.datetime.now()
+
 	# Flood it with our input data untill it begs us to stop,
 	# ... using a valid safe word of course (well an IOError Execption).
 	try:
 		# This will flood the disk with data until the error fires. or we reach our disk size
 		while bytesWritten < size:
+
+			# Define input data for a 1, 0 or Random
+			if write == 0 :
+				# This generates a block of 0's the size of the blocksize by multiplying 1 byte by the blocksize
+				inputData = b'\x00'*blocksize
+			elif write == 1 :
+				# This generates a block of 1's the size of the blocksize by multiplying 1 byte by the blocksize
+				inputData = b'\xFF'*blocksize
+			else:
+				# Generate a random byte of data blocksize times
+				# This is the weirdest line of python I have ever written
+				inputData = bytearray(random.getrandbits(8) for _ in range(blocksize))
+
+			#print(str(inputData))
 
 			#write and count
 			outputFileH.write(inputData)
