@@ -21,7 +21,11 @@ def get_file_size(filename):
 
 # Open and print man page
 def printHelp():
-	print("$HelpText")
+	print("\nNuke: Application for securely erasing drives")
+	print("  Usage: nuke.py [-h][-u][-i iterations][-b blocksize] /path/to/target")
+	print("    All information on the target device is overwritten with sucessive passes")
+	print("    of 0’s and 1’s")
+	print("\n  See man page for more information")
 #end
 
 # Returns the human readable version of a big number with SI Suffix
