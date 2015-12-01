@@ -1,13 +1,18 @@
 # Nuke
 ## About
-Nuke Is a light wieght fast terminal appication for securly erasing hard disks. It addresses disks as files via the linux filesystem so can be used to effectively overwrite any block device or file.
+Nuke Is a light weight fast terminal appication for securly erasing hard disks. It addresses disks as files via the linux filesystem so can be used to effectively overwrite any block device or file.
 ## Usage
 ###Installation (The Quick and Dirty Way)
 Clone / Download the repo
 `cd` to the files
-run `sudo ./nuke.py` 
+run `sudo ./nuke/nuke.py`
+
 ###Installation (The Right Way)
-Something about paths and /usr/local/bin, If someone would like to tell me where the offically correct place to install python apps is then let me know and I'll make a proper launch script that can be linked into the path.
+Clone / Download the repo
+`cd` to the files
+run `python3 ./setup.py build` to build the module
+run `sudo python3 ./setup.py install` to install the module to the machine
+The module is registered as the `nuke` command
 
 ###Running
 ```nuke.py [-h][-i iterations][-b blocksize] target```
